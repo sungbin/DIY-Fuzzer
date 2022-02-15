@@ -5,7 +5,11 @@ int
 main(int argc, char* argv[])
 {
 
-	if(atoi(argv[1]) < 1) {
+        char buf[1024];
+        fgets(buf, 1024, stdin);
+        buf[strlen(buf) - 1] = '\0';
+
+	if(atoi(buf) < 1) {
 		printf("non-positive \n");
 		exit(1);
 	} else {

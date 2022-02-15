@@ -1,2 +1,2 @@
-int runner(int argc, char* argv[]);
-void timer_handler(int pid);
+int runner(char* program_path, char* in_str);
+
