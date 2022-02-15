@@ -1,7 +1,6 @@
 # DIY-Fuzzer
 
 ## TODO:
----
 * ~~write program result to 'result.txt'~~
 * ~~print Pass/Fail as stdout~~
 * ~~move header file to include directory~~
