@@ -86,3 +86,6 @@ Temporary Items
 .apdisk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,c
+
+# Sungbin Added
+*_result.txt
