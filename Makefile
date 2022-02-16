@@ -31,4 +31,4 @@ runner : src/runner.c
 	$(CC) -c -o obj/runner.o src/runner.c
   
 clean:
-	rm -rf $(BINDIR) $(OBJDIR)
+	rm -rf $(BINDIR) $(OBJDIR) test/test_atoi
