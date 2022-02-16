@@ -17,11 +17,11 @@ main(int argc, char* argv[])
 	
 	if(! runner(argv[1],argv[2])) {
 		/*  Pass: return 0 */
-		//printf("INPUT: %s - Pass\n", in_str); // TODO: multiple arguments
+		//printf("INPUT: %s - Pass\n", in_str); // TODO: print result!
 
 	} else {
 		/*  Fail  */
-		//printf("INPUT: %s - Fail\n", in_str); // TODO: multiple arguments
+		//printf("INPUT: %s - Fail\n", in_str); // TODO: print result!
 	}
 
 	return 0;
