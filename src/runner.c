@@ -1,44 +1,44 @@
-#include <stdio.h>
-#include <time.h>
-#include <signal.h>
+//#include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <errno.h>
-#include<sys/types.h>
-#include<sys/stat.h>
 #include<fcntl.h>
 
-int child_pid = 0;
-int out_fd;
-
 int
-runner(char* program_path, char* in_str) {
+runner(char* target_path, char* input_path) {
 
-	printf(""); //for compiler to prevent removing printf
-	out_fd = open("result.txt", O_WRONLY | O_APPEND, 755);
-        int status;
-        pid_t pid = fork();
+	pid_t pid = fork();
         if(pid < 0) {
-          return -1;
+		printf("fork fail\n");
+		return -1;
         }
-	
-        if (pid == 0) {
-	  child_pid = pid;
-          dup2(out_fd, STDOUT_FILENO); 
-	  printf("\n\nINTPUT: %s\n", in_str); //TODO: multiple arguments
-	  printf("OUTPUT: ");
-	  execl(program_path,program_path,in_str,NULL); // TODO: multiple arguments
 
-          _exit(1);
+
+	// child
+	if (pid == 0) {
+
+		int input_fd = open(input_path, O_RDONLY);
+//		printf("infd: %d ", input_fd);
+		int out_fd = open("result.txt", O_WRONLY | O_CREAT, 755);
+//		printf(", outfd: %d \n", out_fd);
+
+		dup(input_fd);
+		dup(out_fd); 
+
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+
+		//dup2(input_fd, STDIN_FILENO);
+		//dup2(out_fd, STDOUT_FILENO); 
+		
+		execl(target_path, target_path, NULL); // TODO: multiple arguments
+		_exit(1);
         }
 
         /* Parent process */
+	int status = 0;
 	if ( waitpid(pid, &status, 0) == -1 ) {
-		perror("waitpid failed");
 		return 1;
 	}
-
-	close(out_fd);
 
 	if ( WIFEXITED(status) ) {
 		const int es = WEXITSTATUS(status);

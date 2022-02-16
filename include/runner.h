@@ -1,2 +1,2 @@
-int runner(char* program_path, char* in_str);
-
+int
+runner(char* target_path, char* input_path);
