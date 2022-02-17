@@ -4,9 +4,8 @@
 #include <stdio.h>
 
 int 
-main(int argc, char* argv[])
+main (int argc, char* argv[])
 {
-
 	int in_t;
 	scanf("%d", &in_t);
 	printf("sleep %d secconds...\n", in_t);
@@ -18,8 +17,6 @@ main(int argc, char* argv[])
 
 		end = (((int)clock()) / CLOCKS_PER_SEC);
 	}
-
-	//sleep(100 * in_t);
 
 	return 0;
 }

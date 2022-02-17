@@ -11,8 +11,8 @@ runner_error_code
 get_error (int incomplete, int type, int exit_code);
 
 runner_error_code
-runner (char *target_path, char *input_path, char *output_path) {
-
+runner (char *target_path, char *input_path, char *output_path)
+{
 	pid_t pid = fork();
         if (pid < 0) { 
 		runner_error_code error_code = get_error(1, E_FORK, 0);
@@ -20,7 +20,6 @@ runner (char *target_path, char *input_path, char *output_path) {
         }
 
         /* Child process */
-        int c_pid; 
         if (pid == 0) { 
                 c_pid = pid; 
                 int input_fd = open(input_path, O_RDONLY);
@@ -43,7 +42,6 @@ runner (char *target_path, char *input_path, char *output_path) {
         while (1) {
                 if ((end - start) > 10) {
                         int ret = kill(pid, SIGKILL);
-                        //int ret = kill(c_pid, SIGINT);
                         if (! ret) {
                                 // success to kill
                                 return 1; //TODO:
@@ -56,10 +54,6 @@ runner (char *target_path, char *input_path, char *output_path) {
                 }
                 
                 int rc = waitpid(pid, &status, WNOHANG);
-                //if (rc == -1) {
-		//	runner_error_code error_code = get_error(1, E_WAITPID, 0);
-		//	return error_code; 
-                //}
 
                 if (! WIFEXITED(status)) {
                         int exit_stated = WEXITSTATUS(status);

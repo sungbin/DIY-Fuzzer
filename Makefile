@@ -1,7 +1,6 @@
 CC      = gcc
 INCLDIR = include/
 BINDIR  = bin/
-#OBJDIR  = obj/
 SRCDIR  = src/
 
 _BIN    = fuzzer
@@ -20,9 +19,6 @@ $(BIN): $(BINDIR) runner main
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
-
-#$(OBJDIR):
-#	mkdir -p $(OBJDIR)
 
 main : src/main.c
 	$(CC) -c -o bin/main.o src/main.c
