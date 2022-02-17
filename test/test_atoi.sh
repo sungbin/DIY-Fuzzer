@@ -1,13 +1,13 @@
 echo "#Test atoi"
 
-cd ../bin/
+#cd ../bin/
 T1RE="1 0 0"
-T1RR=$(./fuzzer ./test_atoi ../test/inputs/test_atoi_input1.txt ./output1.txt)
+T1RR=$(../bin/main ../bin/test_atoi ../test/inputs/test_atoi_input1.txt ../bin/output1.txt)
 sleep 1
 
 T1PE="10"
-T1PR=$(<./output1.txt)
-cd ../test/
+T1PR=$(<../bin/output1.txt)
+#cd ../test/
 
 if [ "$T1RE" == "$T1RR" ]
 then

@@ -3,7 +3,7 @@ INCLDIR = include/
 BINDIR  = bin/
 SRCDIR  = src/
 
-_BIN    = fuzzer
+_BIN    = main
 BIN     = $(addprefix $(BINDIR), $(_BIN))
 
 SRC     = $(wildcard src/*.c)
