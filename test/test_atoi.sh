@@ -1,13 +1,13 @@
 echo "#Test atoi"
+if [ -e "../bin/output1.txt" ]; then
+    rm ../bin/output1.txt
+fi
 
-#cd ../bin/
 T1RE="1 0 0"
 T1RR=$(../bin/main ../bin/test_atoi ../test/inputs/test_atoi_input1.txt ../bin/output1.txt)
-sleep 1
 
 T1PE="10"
 T1PR=$(<../bin/output1.txt)
-#cd ../test/
 
 if [ "$T1RE" == "$T1RR" ]
 then
@@ -16,7 +16,7 @@ else
     echo "Return Value: Fail (Expected: $T1RE, Actual: $T1RR)"
 fi
 
-if [ $T1PE == $T1PR ]
+if [ "$T1PE" == "$T1PR" ]
 then
     echo "Program Output: Pass (Expected: $T1PE, Actual: $T1PR)"
 else
