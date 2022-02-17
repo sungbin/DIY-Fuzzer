@@ -30,5 +30,5 @@ clean:
 	rm -rf $(BINDIR) $(OBJDIR) test/test_atoi
 
 test: $(BIN)
-	gcc test/test_atoi.c -o bin/test_atoi
-	gcc test/test_timeout.c -o bin/test_timeout
+	gcc test/atoi.c -o bin/test_atoi
+	gcc test/timeout.c -o bin/test_timeout
