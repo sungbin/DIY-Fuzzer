@@ -27,7 +27,7 @@ runner : src/runner.c
 	$(CC) -c -o bin/runner.o src/runner.c
   
 clean:
-	rm -rf $(BINDIR) $(OBJDIR) test/test_atoi
+	rm -rf $(BINDIR)
 
 test: $(BIN)
 	gcc test/atoi.c -o bin/test_atoi
