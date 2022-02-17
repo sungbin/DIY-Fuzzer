@@ -41,7 +41,8 @@ runner (char *target_path, char *input_path, char *output_path) {
                         if (! ret) {
                                 // success to kill
                                 return 1; //TODO:
-                        } else {
+                        }
+			else {
                                 // fail to kill
                                 return 1; //TODO:
                         }
