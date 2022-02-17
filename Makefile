@@ -33,5 +33,6 @@ runner : src/runner.c
 clean:
 	rm -rf $(BINDIR) $(OBJDIR) test/test_atoi
 
-test: $(BINDIR)
+test: $(BIN)
 	gcc test/test_atoi.c -o bin/test_atoi
+	gcc test/test_timeout.c -o bin/test_timeout

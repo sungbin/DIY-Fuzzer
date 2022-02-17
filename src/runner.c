@@ -2,17 +2,23 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include<fcntl.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
-int
+#include "../include/runner.h"
+
+runner_error_code
+get_error (int incomplete, int type, int exit_code);
+
+runner_error_code
 runner (char *target_path, char *input_path, char *output_path) {
 
 	pid_t pid = fork();
         if (pid < 0) { 
-                return -1; //TODO: fork ERROR
+		runner_error_code error_code = get_error(1, E_FORK, 0);
+                return error_code;
         }
 
-        
         /* Child process */
         int c_pid; 
         if (pid == 0) { 
@@ -35,31 +41,46 @@ runner (char *target_path, char *input_path, char *output_path) {
         
         int status = 0;
         while (1) {
-                
                 if ((end - start) > 10) {
-                        int ret = kill(c_pid, SIGKILL);
+                        int ret = kill(pid, SIGKILL);
+                        //int ret = kill(c_pid, SIGINT);
                         if (! ret) {
                                 // success to kill
-                                return 1; //TODO:
+				runner_error_code error_code = get_error(1, E_TIMEOUT_KILL, 0);
+                                return error_code;
                         } else {
                                 // fail to kill
-                                return 1; //TODO:
+				runner_error_code error_code = get_error(1, E_CANNOT_KILL, 0);
+                                return error_code; 
                         }
                 }
                 
                 int rc = waitpid(pid, &status, WNOHANG);
-                if (rc == -1) {
-                        return 1; //TODO: waitpid ERROR
-                }
+                //if (rc == -1) {
+		//	runner_error_code error_code = get_error(1, E_WAITPID, 0);
+		//	return error_code; 
+                //}
 
-                if (WIFEXITED(status)) {
+                if (! WIFEXITED(status)) {
                         int exit_stated = WEXITSTATUS(status);
-                        return 0; //TODO: exit_status
+			runner_error_code error_code = get_error(1, 0, exit_stated);
+			return error_code; 
                 }
 
                 end = ((int)clock()) / CLOCKS_PER_SEC;
         }
 
-        return 0;
+	runner_error_code error_code = get_error(0, 0, 0);
+	return error_code; 
 }
 
+runner_error_code
+get_error (int incomplete, int type, int exit_code) {
+	
+	runner_error_code _code = malloc(sizeof(struct_runner_error_code));
+	_code->incomplete = incomplete;
+	_code->type = type;
+	_code->exit_code = exit_code;
+
+	return _code;
+}
