@@ -46,9 +46,9 @@ runner (char *target_path, char *input_path, char *output_path) {
                         //int ret = kill(c_pid, SIGINT);
                         if (! ret) {
                                 // success to kill
-				runner_error_code error_code = get_error(1, E_TIMEOUT_KILL, 0);
-                                return error_code;
-                        } else {
+                                return 1; //TODO:
+                        }
+			else {
                                 // fail to kill
 				runner_error_code error_code = get_error(1, E_CANNOT_KILL, 0);
                                 return error_code; 
