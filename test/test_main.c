@@ -18,12 +18,12 @@ main (int argc, char* argv[])
 	
 	if (! runner(argv[1], argv[2], argv[3])) {
 		/*  Pass: return 0 */
-		printf("  - Pass  \n"); // TODO: print result!
+//		printf("  - Pass  \n"); // TODO: print result!
 
 	}
 	else {
 		/*  Fail  */
-		printf("  - Fail  \n"); // TODO: print result!
+//		printf("  - Fail  \n"); // TODO: print result!
 	}
 
 	return 0;

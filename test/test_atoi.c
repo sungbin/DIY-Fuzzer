@@ -7,8 +7,10 @@ main(int argc, char* argv[])
 {
 
 	char buf[1024];
-	fgets(buf, 1024, stdin);
-	buf[strlen(buf) - 1] = '\0';
+//	fgets(buf, 1024, stdin);
+//	buf[strlen(buf) - 1] = '\0';
+
+	scanf("%s", buf);
 
 	printf("%d\n",atoi(buf));
 
