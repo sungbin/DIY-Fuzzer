@@ -21,7 +21,6 @@ runner (char *target_path, char *input_path, char *output_path)
 
         /* Child process */
         if (pid == 0) { 
-                c_pid = pid; 
                 int input_fd = open(input_path, O_RDONLY);
                 int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
                 
@@ -38,34 +37,25 @@ runner (char *target_path, char *input_path, char *output_path)
         end = ((int)clock()) / CLOCKS_PER_SEC;
 
         
-        int status = 0;
-        while (1) {
-                if ((end - start) > 10) {
-                        int ret = kill(pid, SIGKILL);
-                        if (! ret) {
-                                // success to kill
-                                return 1; //TODO:
-                        }
-			else {
-                                // fail to kill
-				runner_error_code error_code = get_error(1, E_CANNOT_KILL, 0);
-                                return error_code; 
-                        }
-                }
-                
-                int rc = waitpid(pid, &status, WNOHANG);
 
-                if (! WIFEXITED(status)) {
-                        int exit_stated = WEXITSTATUS(status);
-			runner_error_code error_code = get_error(1, 0, exit_stated);
-			return error_code; 
-                }
-
+        while ((end - start) < 10) {
                 end = ((int)clock()) / CLOCKS_PER_SEC;
-        }
+	}
 
-	runner_error_code error_code = get_error(0, 0, 0);
-	return error_code; 
+        int status = 0;
+	waitpid(pid, &status, WNOHANG);
+        if (WIFEXITED(status)) {
+		int exit_stated = WEXITSTATUS(status);
+		runner_error_code error_code = get_error(1, 0, exit_stated);
+		return error_code;
+	}
+	else {
+		int ret = kill(pid, SIGKILL);
+		runner_error_code error_code = get_error(1, E_TIMEOUT_KILL, 0);
+		return error_code; 
+	}
+
+	/* cannot reach this area*/
 }
 
 runner_error_code

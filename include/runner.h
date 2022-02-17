@@ -1,6 +1,3 @@
-#ifndef RUNNER_H
-#define RUNNER_H
-
 /* runner_error_code->type list */
 #define E_FORK 0x01
 #define E_TIMEOUT_KILL 0x02
@@ -17,4 +14,3 @@ typedef struct struct_runner_error_code {
 runner_error_code
 runner (char* target_path, char* input_path, char *output_path);
 
-#endif 
