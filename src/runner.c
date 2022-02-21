@@ -8,14 +8,14 @@
 #include "../include/runner.h"
 
 runner_error_code
-get_error (int incomplete, int type, int exit_code);
+get_error (enum E_Type type, int exit_code);
 
 runner_error_code
 runner (char *target_path, char *input_path, char *output_path)
 {
 	pid_t pid = fork();
         if (pid < 0) { 
-		runner_error_code error_code = get_error(1, E_FORK, 0);
+		runner_error_code error_code = get_error(E_FORK, 0);
                 return error_code;
         }
 
@@ -46,12 +46,12 @@ runner (char *target_path, char *input_path, char *output_path)
 	waitpid(pid, &status, WNOHANG);
         if (WIFEXITED(status)) {
 		int exit_stated = WEXITSTATUS(status);
-		runner_error_code error_code = get_error(1, 0, exit_stated);
+		runner_error_code error_code = get_error(0, exit_stated);
 		return error_code;
 	}
 	else {
 		int ret = kill(pid, SIGKILL);
-		runner_error_code error_code = get_error(1, E_TIMEOUT_KILL, 0);
+		runner_error_code error_code = get_error(E_TIMEOUT_KILL, 0);
 		return error_code; 
 	}
 
@@ -59,12 +59,10 @@ runner (char *target_path, char *input_path, char *output_path)
 }
 
 runner_error_code
-get_error (int incomplete, int type, int exit_code) {
-	
-	runner_error_code _code = malloc(sizeof(struct_runner_error_code));
-	_code->incomplete = incomplete;
-	_code->type = type;
-	_code->exit_code = exit_code;
+get_error (enum E_Type type, int exit_code) {
+	runner_error_code _code;
+	_code.type = type;
+	_code.exit_code = exit_code;
 
 	return _code;
 }

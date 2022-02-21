@@ -27,7 +27,7 @@ main (int argc, char* argv[])
 	
 	runner_error_code error_code = runner(argv[1], argv[2], argv[3]);
 
-	printf("%d 0x%x %d", error_code->incomplete, error_code->type, error_code->exit_code);
+	printf("0x%x %d\n", error_code.type, error_code.exit_code);
 
 	return 0;
 }
