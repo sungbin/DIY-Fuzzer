@@ -1,25 +1,37 @@
 echo "#Test timeout"
-
-cd ../bin/
-T1RE="1 0x4 0"
-T1RR=$(./fuzzer ./test_timeout ../test/inputs/test_timeout_input1.txt ./output2.txt)
-sleep 1
-
-T1PE="sleep 11 secconds..."
-T1PR=$(<./output2.txt)
-cd ../test/
-
-if [ "$T1RE" == "$T1RR" ]
-then
-    echo "Return Value: Pass (Expected: $T1RE, Actual: $T1RR)"
-else
-    echo "Return Value: Fail (Expected: $T1RE, Actual: $T1RR)"
+if [ -e "../bin/return_output2.txt" ]; then
+    rm ../bin/return_output2.txt
+fi
+if [ -e "../bin/program_output2.txt" ]; then
+    rm ../bin/program_output2.txt
 fi
 
-if [ "$T1PE" == "$T1PR" ]
+# Return Value Test
+T2RE="./expected_outputs/return_output2.txt"
+T2RR="../bin/return_output2.txt"
+../bin/main ../bin/test_timeout ../test/inputs/test_timeout_input1.txt ../bin/output2.txt > $T2RR
+
+# Program Test
+T2PE="./expected_outputs/program_output2.txt"
+T2PR="../bin/output2.txt"
+
+diff $T2RE $T2RR
+if [ $? -eq 0 ]
 then
-    echo "Program Output: Pass (Expected: $T1PE, Actual: $T1PR)"
+	echo "Return Output: Pass"
+	# (Expected: $T2RE), Actual: $T2RR)
 else
-    echo "Program Output: Fail (Expected: $T1PE, Actual: $T1PR)"
+	echo "Return Output: Fail"
+	# (Expected: $T2RE), Actual: $T2RR)
 fi
 
+
+diff $T2PE $T2PR
+if [ $? -eq 0 ]
+then
+	echo "Program Output: Pass"
+	# (Expected: $T2PE), Actual: $T2PR)
+else
+	echo "Program Output: Fail"
+	# (Expected: $T2PE, Actual: $T2PR)
+fi

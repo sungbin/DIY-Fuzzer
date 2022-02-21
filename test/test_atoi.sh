@@ -1,25 +1,37 @@
 echo "#Test atoi"
-if [ -e "../bin/output1.txt" ]; then
-    rm ../bin/output1.txt
+if [ -e "../bin/return_output1.txt" ]; then
+    rm ../bin/return_output1.txt
+fi
+if [ -e "../bin/program_output1.txt" ]; then
+    rm ../bin/program_output1.txt
 fi
 
-T1RE="1 0 0"
-T1RR=$(../bin/main ../bin/test_atoi ../test/inputs/test_atoi_input1.txt ../bin/output1.txt)
+# Return Value Test
+T1RE="./expected_outputs/return_output1.txt"
+T1RR="../bin/return_output1.txt"
+../bin/main ../bin/test_atoi ../test/inputs/test_atoi_input1.txt ../bin/output1.txt > $T1RR
 
-T1PE="10"
-T1PR=$(<../bin/output1.txt)
+# Program Test
+T1PE="./expected_outputs/program_output1.txt"
+T1PR="../bin/output1.txt"
 
-if [ "$T1RE" == "$T1RR" ]
+diff $T1RE $T1RR
+if [ $? -eq 0 ]
 then
-    echo "Return Value: Pass (Expected: $T1RE, Actual: $T1RR)"
+	echo "Return Output: Pass"
+	# (Expected: $T1RE), Actual: $T1RR)
 else
-    echo "Return Value: Fail (Expected: $T1RE, Actual: $T1RR)"
+	echo "Return Output: Fail"
+	# (Expected: $T1RE), Actual: $T1RR)
 fi
 
-if [ "$T1PE" == "$T1PR" ]
+
+diff $T1PE $T1PR
+if [ $? -eq 0 ]
 then
-    echo "Program Output: Pass (Expected: $T1PE, Actual: $T1PR)"
+	echo "Program Output: Pass"
+	# (Expected: $T1PE), Actual: $T1PR)
 else
-    echo "Program Output: Fail (Expected: $T1PE, Actual: $T1PR)"
+	echo "Program Output: Fail"
+	# (Expected: $T1PE, Actual: $T1PR)
 fi
-
