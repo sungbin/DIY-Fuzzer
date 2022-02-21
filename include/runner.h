@@ -1,4 +1,5 @@
 enum E_Type {    // 열거형 정의
+	NO_ERROR,
 	E_FORK,
 	E_TIMEOUT_KILL,
 };

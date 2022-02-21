@@ -42,15 +42,19 @@ runner (char *target_path, char *input_path, char *output_path)
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
 
+	int ret = kill(pid, SIGKILL);
         int status = 0;
-	waitpid(pid, &status, WNOHANG);
+	//waitpid(pid, &status, 0);
+	waitpid(pid, &status, 0);
+
         if (WIFEXITED(status)) {
+
 		int exit_stated = WEXITSTATUS(status);
-		runner_error_code error_code = get_error(0, exit_stated);
+		runner_error_code error_code = get_error(NO_ERROR, exit_stated);
 		return error_code;
 	}
 	else {
-		int ret = kill(pid, SIGKILL);
+
 		runner_error_code error_code = get_error(E_TIMEOUT_KILL, 0);
 		return error_code; 
 	}
