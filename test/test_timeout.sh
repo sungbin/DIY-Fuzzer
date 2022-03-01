@@ -9,7 +9,7 @@ fi
 # Return Value Test
 T2RE="./expected_outputs/return_output2.txt"
 T2RR="../bin/return_output2.txt"
-../bin/main ../bin/test_timeout ../test/inputs/test_timeout_input1.txt ../bin/output2.txt > $T2RR
+../bin/main ../bin/test_timeout ../test/inputs/test_input2.txt ../bin/output2.txt > $T2RR
 
 # Program Test
 T2PE="./expected_outputs/program_output2.txt"

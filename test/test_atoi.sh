@@ -9,7 +9,7 @@ fi
 # Return Value Test
 T1RE="./expected_outputs/return_output1.txt"
 T1RR="../bin/return_output1.txt"
-../bin/main ../bin/test_atoi ../test/inputs/test_atoi_input1.txt ../bin/output1.txt > $T1RR
+../bin/main ../bin/test_atoi ../test/inputs/test_input1.txt ../bin/output1.txt > $T1RR
 
 # Program Test
 T1PE="./expected_outputs/program_output1.txt"
