@@ -38,7 +38,7 @@ runner (char *target_path, char *input_path, char *output_path)
 
         
 
-        while ((end - start) < 10) {
+        while ((end - start) < 3) {
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
 
