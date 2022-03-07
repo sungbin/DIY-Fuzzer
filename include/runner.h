@@ -10,5 +10,5 @@ typedef struct _runner_error_code {
 } runner_error_code;
 
 runner_error_code
-runner (char* target_path, char* input_path, char *output_path);
+runner (char* target_path, char* input_path, char *output_path, char *output_err_path);
 

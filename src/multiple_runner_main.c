@@ -8,7 +8,7 @@
 #include "../include/runner.h"
 
 void
-explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir);
+explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir);
 
 int 
 main (int argc, char* argv[])
@@ -29,7 +29,8 @@ main (int argc, char* argv[])
 }
 
 void
-explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir) {
+explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir)
+{
 
 	char * inner_dir_path;
 
@@ -73,21 +74,24 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 
 			}
 
-			char * input_path, * program_out_path;
-			int input_path_len, program_out_path_len; 
+			char * input_path, * program_out_path, * program_err_path;
+			int input_path_len, program_out_path_len, program_err_path_len; 
 
 			input_path_len = strlen(input_dir_path)+strlen(sub_child_dir)+2;
 			program_out_path_len = strlen(output_dir_path)+strlen(sub_child_dir)+2;
+			program_err_path_len = strlen(output_dir_path)+strlen(sub_child_dir)+6; // +4 chracters ".err"
 
 			input_path = malloc(sizeof(char) * input_path_len);
 			program_out_path = malloc(sizeof(char) * program_out_path_len);
+			program_err_path = malloc(sizeof(char) * program_err_path_len);
 			
 			snprintf(input_path, input_path_len, "%s/%s", input_dir_path, sub_child_dir);
 			snprintf(program_out_path, program_out_path_len, "%s/%s", output_dir_path, sub_child_dir);
+			snprintf(program_err_path, program_err_path_len, "%s/%s.err", output_dir_path, sub_child_dir);
 
 			// (*_runner)(input_path, program_out_path, ep->d_type == DT_DIR);
 
-			runner_error_code error_code = (*_runner)(target_path, input_path, program_out_path);
+			runner_error_code error_code = (*_runner)(target_path, input_path, program_out_path, program_err_path);
 
 			if (error_code.type == NO_ERROR) {
 				printf("Input: %s\n", input_path);
@@ -106,6 +110,7 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 			free(sub_child_dir);
 			free(input_path);
 			free(program_out_path);
+			free(program_err_path);
                 }
                 closedir(dp);
         }

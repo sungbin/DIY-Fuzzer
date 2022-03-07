@@ -7,12 +7,17 @@
 
 #include "../include/runner.h"
 
+#include <stdio.h>
+
 runner_error_code
 get_error (enum E_Type type, int exit_code);
 
 runner_error_code
-runner (char *target_path, char *input_path, char *output_path)
+runner (char* target_path, char* input_path, char *output_path, char *output_err_path)
 {
+
+	fprintf(stdout,"err: %s\n", output_err_path);
+
 	pid_t pid = fork();
         if (pid < 0) { 
 		runner_error_code error_code = get_error(E_FORK, 0);
@@ -23,9 +28,11 @@ runner (char *target_path, char *input_path, char *output_path)
         if (pid == 0) { 
                 int input_fd = open(input_path, O_RDONLY);
                 int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+                int out_err_fd = open(output_err_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
                 
                 dup2(input_fd, STDIN_FILENO);
                 dup2(out_fd, STDOUT_FILENO);
+                dup2(out_err_fd, STDERR_FILENO);
                 
                 execl(target_path, target_path, NULL);
                 _exit(1);
@@ -37,7 +44,6 @@ runner (char *target_path, char *input_path, char *output_path)
         end = ((int)clock()) / CLOCKS_PER_SEC;
 
         
-
         while ((end - start) < 3) {
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
