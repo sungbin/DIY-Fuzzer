@@ -1,13 +1,14 @@
-echo "#Test atoi"
+echo "#Test atoi with multiple inputs"
 
-#RO_dir="../bin/test_multiple"
+multiple_main="../bin/multiple_runner_main"
 PI_dir="../test/inputs"
 PO_dir="../bin/test_multiple"
 
-#TODO: mkdir output folder
+if [ ! -e $PO_dir ]; then
+    mkdir -p $PO_dir
+fi
+
 
 # EXECUTE
-../bin/main ../bin/test_atoi $PI_dir $PO_dir
+multiple_main ../bin/test_atoi $PI_dir $PO_dir
 
-
-# Program Test

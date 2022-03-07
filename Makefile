@@ -3,7 +3,7 @@ INCLDIR = include/
 BINDIR  = bin/
 SRCDIR  = src/
 
-_BIN    = main
+_BIN    = multiple_runner_main
 BIN     = $(addprefix $(BINDIR), $(_BIN))
 
 SRC     = $(wildcard src/*.c)
@@ -14,15 +14,12 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 
 all: $(BIN)
 
-$(BIN): $(BINDIR) runner main multiple_runner_main
+$(BIN): $(BINDIR) runner multiple_runner_main
 	$(CC) $(OBJS) -o $(BIN)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-main : src/main.c
-	$(CC) -c -o bin/main.o src/main.c
-  
 runner : src/runner.c
 	$(CC) -c -o bin/runner.o src/runner.c
   
