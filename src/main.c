@@ -1,14 +1,23 @@
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 #include "../include/runner.h"
 
 void
-explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir);
+explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*, int), char * target_path, char * output_dir_path, int recursive_dir, int is_bcov);
+
+int
+mkdirs (char * dir_path);
+
+char *
+parent_dir (char * dir_path);
 
 int 
 main (int argc, char* argv[])
@@ -19,17 +28,31 @@ main (int argc, char* argv[])
                 exit(1);
         }
 
-	// argv[1]: target_path;
-	// argv[2]: input_dir_path;
-	// argv[3]: output_dir_path;
-	
-	explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0);
+	int is_bcov = 0;
+	if (strcmp(argv[1], "-bcov") == 0) {
+		is_bcov = 1;
+		explore_dir_with_runner(argv[3], "",  &runner, argv[2], argv[4], 0, is_bcov);
+	}
+	else if (strcmp(argv[4], "-bcov") == 0) {
+
+		is_bcov = 1;
+		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
+	}
+	else {
+
+		// argv[1]: target_path;
+		// argv[2]: input_dir_path;
+		// argv[3]: output_dir_path;
+		is_bcov = 0;
+		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
+	}
+
 
 	return 0;
 }
 
 void
-explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*), char * target_path, char * output_dir_path, int recursive_dir) {
+explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_code (*_runner)(char*, char*, char*, int), char * target_path, char * output_dir_path, int recursive_dir, int is_bcov) {
 
 	char * inner_dir_path;
 
@@ -51,7 +74,7 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
         struct dirent *ep;
 
         if (dp != NULL) {
-                while (ep = readdir(dp)) {
+                while ((ep = readdir(dp))) {
                         if (strcmp(ep->d_name,".") == 0) {
                                 continue;
                         }
@@ -85,9 +108,11 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 			snprintf(input_path, input_path_len, "%s/%s", input_dir_path, sub_child_dir);
 			snprintf(program_out_path, program_out_path_len, "%s/%s", output_dir_path, sub_child_dir);
 
-			// (*_runner)(input_path, program_out_path, ep->d_type == DT_DIR);
+			if (mkdirs(dirname(program_out_path))) {
+				fprintf(stderr, "ERROR: cannot mkdirs %s\n", dirname(dirname(program_out_path)));
+			}
 
-			runner_error_code error_code = (*_runner)(target_path, input_path, program_out_path);
+			runner_error_code error_code = (*_runner)(target_path, input_path, program_out_path, is_bcov);
 
 			if (error_code.type == NO_ERROR) {
 				printf("Input: %s\n", input_path);
@@ -99,7 +124,7 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 
                         if (recursive_dir && ep->d_type == DT_DIR) {
 
-				explore_dir_with_runner(input_dir_path, "",  &runner, target_path, output_dir_path, 0);
+				explore_dir_with_runner(input_dir_path, "",  &runner, target_path, output_dir_path, 0, is_bcov);
 
                         } 
 
@@ -118,4 +143,33 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 
 	free(inner_dir_path);
 
+}
+char *
+parent_dir (char * path) {
+
+	int lidx = strrchr(path, '/') - path;
+	char * parent_dir_path = malloc(lidx * sizeof(char));
+	strncpy(parent_dir_path, path, lidx);
+
+	return parent_dir_path;
+}
+
+int
+mkdirs (char * dir_path) {
+
+	char * p_dir;
+	if (access(dir_path, F_OK) == 0) {
+		/* already exists*/
+		return 0;
+	}
+	else if (access((p_dir=parent_dir(dir_path)), F_OK) == 0) {
+		free(p_dir);
+		return mkdir(dir_path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	}
+	else {
+
+		int val = mkdirs(p_dir) || mkdir(dir_path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+		free(p_dir);
+		return val;
+	}
 }

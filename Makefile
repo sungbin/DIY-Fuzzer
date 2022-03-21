@@ -3,7 +3,7 @@ INCLDIR = include/
 BINDIR  = bin/
 SRCDIR  = src/
 
-_BIN    = multiple_runner_main
+_BIN    = main
 BIN     = $(addprefix $(BINDIR), $(_BIN))
 
 SRC     = $(wildcard src/*.c)
@@ -14,7 +14,7 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 
 all: $(BIN)
 
-$(BIN): $(BINDIR) runner multiple_runner_main
+$(BIN): $(BINDIR) runner main
 	$(CC) $(OBJS) -o $(BIN)
 
 $(BINDIR):
@@ -23,19 +23,12 @@ $(BINDIR):
 runner : src/runner.c
 	$(CC) -c -o bin/runner.o src/runner.c
   
-multiple_runner_main : src/multiple_runner_main.c
-	$(CC) -c -o bin/multiple_runner_main.o src/multiple_runner_main.c
+main : src/main.c
+	$(CC) -c -o bin/main.o src/main.c
 
 clean:
 	rm -rf $(BINDIR)
-	rm ./jsondump
 
 test: $(BIN)
 	gcc test/test_c_with_one_input/atoi.c -o bin/test_atoi
 	gcc test/test_c_with_one_input/timeout.c -o bin/test_timeout
-
-jsondump: $(BINDIR)
-	cc -c  src/jsondump.c -o bin/jsondump.o
-	cc -c  src/jsmn.c -o bin/jsmn.o
-	ar rc libjsmn.a bin/jsmn.o
-	cc  bin/jsondump.o libjsmn.a -o jsondump
