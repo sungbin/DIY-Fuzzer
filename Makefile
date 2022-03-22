@@ -15,19 +15,19 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 all: $(BIN)
 
 $(BIN): $(BINDIR) runner main trace
-	$(CC) $(OBJS) -fsanitize=address -o $(BIN)
+	$(CC) $(OBJS) -fsanitize=address -g -o $(BIN)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
 runner : src/runner.c
-	$(CC) -c -o bin/runner.o src/runner.c
+	$(CC) -g -c -o bin/runner.o src/runner.c
   
 main : src/main.c
-	$(CC) -c -o bin/main.o src/main.c
+	$(CC) -g -c -o bin/main.o src/main.c
 
 trace : src/trace-pc.c
-	$(CC) -fsanitize=address -o bin/trace-pc.o -c src/trace-pc.c 
+	$(CC) -fsanitize=address -g -o bin/trace-pc.o -c src/trace-pc.c 
 
 clean:
 	rm -rf $(BINDIR)

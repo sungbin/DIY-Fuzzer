@@ -112,9 +112,11 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 			snprintf(input_path, input_path_len, "%s/%s", input_dir_path, sub_child_dir);
 			snprintf(program_out_path, program_out_path_len, "%s/%s", output_dir_path, sub_child_dir);
 
-			if (mkdirs(dirname(program_out_path))) {
+			char * p_dir = parent_dir(program_out_path);
+			if (mkdirs(p_dir)) {
 				fprintf(stderr, "ERROR: cannot mkdirs %s\n", dirname(dirname(program_out_path)));
 			}
+			free(p_dir);
 
 			runner_error_code error_code = (*_runner)(target_path, input_path, program_out_path, is_bcov);
 
@@ -148,12 +150,20 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 	free(inner_dir_path);
 
 }
+
+// need to free()
 char *
 parent_dir (char * path) {
 
-	int lidx = strrchr(path, '/') - path;
-	char * parent_dir_path = malloc(lidx * sizeof(char));
+	char * p = strrchr(path, '/');
+	if (p == 0x0) {
+		fprintf(stderr,"strrchr error!\n");
+		exit(1);
+	}
+	int lidx = p - path;
+	char * parent_dir_path = malloc((lidx+1) * sizeof(char));
 	strncpy(parent_dir_path, path, lidx);
+	parent_dir_path[lidx] = 0x0;
 
 	return parent_dir_path;
 }
