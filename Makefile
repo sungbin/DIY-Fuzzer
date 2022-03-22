@@ -15,20 +15,20 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 all: $(BIN)
 
 $(BIN): $(BINDIR) runner main
-	$(CC) $(OBJS) -o $(BIN)
+	$(CC) $(OBJS) -g -o $(BIN)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
 runner : src/runner.c
-	$(CC) -c -o bin/runner.o src/runner.c
+	$(CC) -c -g -o bin/runner.o src/runner.c
   
 main : src/main.c
-	$(CC) -c -o bin/main.o src/main.c
+	$(CC) -c -g -o bin/main.o src/main.c
 
 clean:
 	rm -rf $(BINDIR)
 
 test: $(BIN)
-	gcc test/test_c_with_one_input/atoi.c -o bin/test_atoi
-	gcc test/test_c_with_one_input/timeout.c -o bin/test_timeout
+	gcc test/test_c_with_one_input/atoi.c -g -o bin/test_atoi
+	gcc test/test_c_with_one_input/timeout.c -g -o bin/test_timeout
