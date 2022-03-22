@@ -23,13 +23,21 @@ int
 main (int argc, char* argv[])
 {
 
+	int is_bcov;
 	if (argc < 4) {
                 fprintf(stderr, "ERROR: THE NUMBER OF AGURMENTS MUST BE BIGGER THAN THREE!\n");
                 exit(1);
         }
+	else if (argc == 4) {
 
-	int is_bcov = 0;
-	if (strcmp(argv[1], "-bcov") == 0) {
+		// argv[1]: target_path;
+		// argv[2]: input_dir_path;
+		// argv[3]: output_dir_path;
+		is_bcov = 0;
+		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
+	}
+	else if (strcmp(argv[1], "-bcov") == 0) {
+
 		is_bcov = 1;
 		explore_dir_with_runner(argv[3], "",  &runner, argv[2], argv[4], 0, is_bcov);
 	}
@@ -39,12 +47,8 @@ main (int argc, char* argv[])
 		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
 	}
 	else {
-
-		// argv[1]: target_path;
-		// argv[2]: input_dir_path;
-		// argv[3]: output_dir_path;
-		is_bcov = 0;
-		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
+                fprintf(stderr, "ERROR: THE NUMBER OF AGURMENTS MUST BE BIGGER THAN THREE!\n");
+                exit(1);
 	}
 
 
