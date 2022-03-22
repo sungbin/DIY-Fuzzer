@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <stdint.h>
 #include <sanitizer/coverage_interface.h>
 
-#include "./trace-pc.h"
+#include "../include/trace-pc.h"
 
 extern void
 __sanitizer_cov_trace_pc_guard_init (uint32_t *start, uint32_t *stop) {

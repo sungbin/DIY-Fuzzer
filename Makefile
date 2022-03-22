@@ -1,4 +1,4 @@
-CC      = gcc
+CC      = clang
 INCLDIR = include/
 BINDIR  = bin/
 SRCDIR  = src/
@@ -14,21 +14,25 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 
 all: $(BIN)
 
-$(BIN): $(BINDIR) runner main
-	$(CC) $(OBJS) -g -o $(BIN)
+$(BIN): $(BINDIR) runner main trace
+	$(CC) $(OBJS) -fsanitize=address -o $(BIN)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
 runner : src/runner.c
-	$(CC) -c -g -o bin/runner.o src/runner.c
+	$(CC) -c -o bin/runner.o src/runner.c
   
 main : src/main.c
-	$(CC) -c -g -o bin/main.o src/main.c
+	$(CC) -c -o bin/main.o src/main.c
+
+trace : src/trace-pc.c
+	$(CC) -fsanitize=address -o bin/trace-pc.o -c src/trace-pc.c 
 
 clean:
 	rm -rf $(BINDIR)
 
 test: $(BIN)
-	gcc test/test_c_with_one_input/atoi.c -g -o bin/test_atoi
-	gcc test/test_c_with_one_input/timeout.c -g -o bin/test_timeout
+	$(CC) test/test_c_with_one_input/atoi.c -g -o bin/test_atoi
+	$(CC) test/test_c_with_one_input/timeout.c -g -o bin/test_timeout
+	$(CC) -g -fsanitize=address -fsanitize-coverage=trace-pc-guard -o bin/test_triangle test/test_c_with_three_input/triangle.c bin/trace-pc.o

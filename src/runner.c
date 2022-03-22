@@ -1,17 +1,33 @@
-#include <time.h>
+#include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
+
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <libgen.h>
 
 #include "../include/runner.h"
+#include "../include/trace-pc.h"
+
+FILE * bcov_fp = 0x0;
 
 runner_error_code
 get_error (enum E_Type type, int exit_code);
 
 runner_error_code
 runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
+
+	char * bcov_path;
+	if (is_bcov) {
+		char * f_name = basename(input_path);
+		char * d_name = dirname(output_path);
+		bcov_path = malloc(sizeof(char) * (strlen(f_name) + strlen(d_name) + 7));
+		sprintf(bcov_path, "%s/%s.bcov", d_name, f_name);
+		bcov_fp = fopen(bcov_path, "wb");
+	}
 
 	pid_t pid = fork();
         if (pid < 0) { 
@@ -21,6 +37,7 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 
         /* Child process */
         if (pid == 0) { 
+
 	       int input_fd = open(input_path, O_RDONLY);
 	       int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 	       
@@ -43,6 +60,11 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 			break;
 		}
 	       end = ((int)clock()) / CLOCKS_PER_SEC;
+	}
+
+	if (is_bcov) {
+		fclose(bcov_fp);
+		free(bcov_path);
 	}
 
 	int exit_stated = WEXITSTATUS(status);
