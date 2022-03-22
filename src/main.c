@@ -19,6 +19,42 @@ mkdirs (char * dir_path);
 char *
 parent_dir (char * dir_path);
 
+unsigned int total_branch;
+
+typedef struct _bcov_set {
+	unsigned int pc;
+	struct _bcov_set * next;
+
+} bcov_set;
+
+typedef struct _bcov {
+	unsigned int pc;
+	unsigned int des_len;
+	char des[1024];
+	struct _bcov * next;
+} bcov;
+
+
+bcov_set * b_set = 0x0;
+
+void
+update_branch_set (bcov_set * _set, unsigned int pc);
+
+bcov*
+read_bcov (char * bcov_path);
+
+void
+print_branch_set (bcov_set * _set);
+
+void
+print_bcov (bcov * b);
+
+void
+free_set (bcov_set * b_set);
+
+void
+free_bcov (bcov * b);
+
 int 
 main (int argc, char* argv[])
 {
@@ -40,17 +76,20 @@ main (int argc, char* argv[])
 
 		is_bcov = 1;
 		explore_dir_with_runner(argv[3], "",  &runner, argv[2], argv[4], 0, is_bcov);
+		print_branch_set(b_set);
+		free_set(b_set);
 	}
 	else if (strcmp(argv[4], "-bcov") == 0) {
 
 		is_bcov = 1;
 		explore_dir_with_runner(argv[2], "",  &runner, argv[1], argv[3], 0, is_bcov);
+		print_branch_set(b_set);
+		free_set(b_set);
 	}
 	else {
                 fprintf(stderr, "ERROR: THE NUMBER OF AGURMENTS MUST BE BIGGER THAN THREE!\n");
                 exit(1);
 	}
-
 
 	return 0;
 }
@@ -122,7 +161,18 @@ explore_dir_with_runner (char * input_dir_path, char * sub_dir, runner_error_cod
 
 			if (error_code.type == NO_ERROR) {
 				printf("Input: %s\n", input_path);
-				printf("-> Output: %s\n\n", program_out_path);
+				printf("Output: %s\n\n", program_out_path);
+				
+				//read bcov
+				char * bcov_path = malloc(sizeof(char) * (strlen(program_out_path) + 6));
+				sprintf(bcov_path, "%s.bcov", program_out_path);
+				bcov * b = read_bcov(bcov_path);
+
+				printf("branch-coverage of %s:\n", bcov_path);
+				print_bcov(b);
+
+				free_bcov(b);
+				free(bcov_path);
 			}
 			else {
 				printf("Fail to run with: %s\n", input_path);
@@ -185,5 +235,134 @@ mkdirs (char * dir_path) {
 		int val = mkdirs(p_dir) || mkdir(dir_path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 		free(p_dir);
 		return val;
+	}
+}
+
+bcov*
+read_bcov (char * bcov_path) {
+
+	FILE * bcov_fp = fopen(bcov_path, "rb");
+	fread(&total_branch, 1, 4, bcov_fp);
+	int buf_len = 0;
+
+	bcov * b = 0x0;
+	bcov * last_b = 0x0;
+	do {
+		unsigned int pc;
+		buf_len = fread(&pc, 1, 4, bcov_fp);
+		if (buf_len != 4) break;
+
+		unsigned int des_len;
+		buf_len = fread(&des_len, 1, 4, bcov_fp);
+		if (buf_len != 4) break;
+
+		char des[1024];
+		buf_len = fread(des, 1, des_len, bcov_fp);
+		if (buf_len != des_len) break;
+
+		//printf("read: %s\npc:%u, des_len:%u, des: %s\n",bcov_path, pc, des_len, des);
+
+		if (b  == 0x0) {
+			b = malloc(sizeof(bcov));
+			b->pc = pc;
+			b->des_len = des_len;
+			strcpy(b->des, des);
+			b->next = 0x0;
+			last_b = b;
+		}
+		else {
+			bcov * _b = malloc(sizeof(bcov));
+			_b->pc = pc;
+			_b->des_len = des_len;
+			strcpy(b->des, des);
+			_b->next = 0x0;
+			last_b->next = _b;
+			last_b = _b;
+		}
+		update_branch_set(b_set, pc);
+
+	} while(buf_len > 0);
+
+	fclose(bcov_fp);
+	return b;
+}
+void
+update_branch_set (bcov_set * _set, unsigned int pc) {
+
+	bcov_set * __set = _set;
+	while (__set != 0x0) {
+		if(__set->pc == pc) {
+			break;
+		}
+		else {
+			__set = __set->next;
+		}
+	}
+	if (_set == 0x0) {
+		__set = malloc(sizeof(bcov_set));
+		__set->pc = pc;
+		__set->next = 0x0;
+		b_set = __set;
+	}
+	else if (__set == 0x0) {
+		__set = _set;
+		while(__set->next != 0x0) { __set = __set->next;}
+		__set->next = malloc(sizeof(bcov_set));
+		__set->next->pc = pc;
+		__set->next->next = 0x0;
+
+	}
+	else {
+		// already exists
+	}
+	
+}
+void
+print_branch_set (bcov_set * _set) {
+	printf("Total branch Coverage of All inputs:\n");
+	unsigned int n = 0;
+	printf("{");
+	bcov_set * _b = _set;
+	while (_b != 0x0) {
+		printf("%u, ", _b->pc);
+		_b = _b->next;
+		n++;
+	}
+	printf("\b\b}\n");
+	printf("%.1f%% (%u/%u)\n", (float) n*100 / (float) total_branch, n, total_branch);
+}
+
+
+void
+print_bcov (bcov * b) {
+	unsigned int n = 0;
+	printf("{");
+	bcov * _b = b;
+	while (_b != 0x0) {
+		printf("%u, ", _b->pc);
+		_b = _b->next;
+		n++;
+	}
+	printf("\b\b}\n");
+	printf("%.1f%% (%u/%u)\n\n", (float) n*100 / (float) total_branch, n, total_branch);
+}
+
+void
+free_set (bcov_set * b_set) {
+
+	bcov_set * next;
+	while (b_set != 0x0) {
+		next = b_set->next;
+		free(b_set);
+		b_set = next;
+	}
+}
+void
+free_bcov (bcov * b) {
+	bcov * next;
+	while (b != 0x0) {
+		next = b->next;
+		free(b);
+		b = next;
 	}
 }

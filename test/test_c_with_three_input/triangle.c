@@ -2,8 +2,6 @@
 
 #include "../../include/trace-pc.h"
 
-FILE * bcov_fp = 0x0;
-
 int 
 main ()
 {

@@ -10,9 +10,6 @@
 #include <libgen.h>
 
 #include "../include/runner.h"
-#include "../include/trace-pc.h"
-
-FILE * bcov_fp = 0x0;
 
 runner_error_code
 get_error (enum E_Type type, int exit_code);
@@ -23,13 +20,11 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 	char * bcov_path;
 	if (is_bcov) {
 		char * f_name = basename(input_path);
-		char * d_name = dirname(output_path);
-		bcov_path = malloc(sizeof(char) * (strlen(f_name) + strlen(d_name) + 7));
+		char * d_name = dirname(strdup(output_path));
+		bcov_path = malloc(sizeof(char) * (strlen(f_name) + strlen(d_name) + 9));
 		sprintf(bcov_path, "%s/%s.bcov", d_name, f_name);
-		bcov_fp = fopen(bcov_path, "wb");
+		free(d_name);
 	}
-
-	printf("@ in: %s\n@ out: %s\n", input_path, output_path);
 
 	pid_t pid = fork();
         if (pid < 0) { 
@@ -43,10 +38,6 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 	       int input_fd = open(input_path, O_RDONLY);
 	       int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 	       
-	       //dup2(input_fd, STDIN_FILENO);
-	       //dup2(out_fd, STDOUT_FILENO);
-	       //while (dup2(input_fd, STDIN_FILENO) == -1) { };
-	       //while (dup2(out_fd, STDOUT_FILENO) == -1) { };
 	       if (dup2(input_fd, STDIN_FILENO) == -1) {
 		       perror("dup2-input");
 	       }
@@ -73,7 +64,10 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 	}
 
 	if (is_bcov) {
-		fclose(bcov_fp);
+		if (rename("./temp.bcov", bcov_path) == -1) {
+		       perror("ERROR rename:");
+		       exit(1);
+		}
 		free(bcov_path);
 	}
 

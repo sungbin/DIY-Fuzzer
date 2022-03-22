@@ -7,9 +7,12 @@
 
 #include "../include/trace-pc.h"
 
+FILE * bcov_fp = 0x0;
+unsigned int N = 0;  // Counter for the guards.
+int minit = 0;
+
 extern void
 __sanitizer_cov_trace_pc_guard_init (uint32_t *start, uint32_t *stop) {
-  static uint64_t N = 0;  // Counter for the guards.
   if (start == stop || *start) return;  // Initialize only once.
   printf("INIT: %p %p\n", start, stop);
   for (uint32_t *x = start; x < stop; x++)
@@ -25,8 +28,12 @@ __sanitizer_cov_trace_pc_guard (uint32_t *guard) {
   printf("guard: %p %x PC %s\n", guard, *guard, PcDescr);
 
   if (bcov_fp != 0x0) {
+     if (! minit) {
+        fwrite(&N, 1, 4, bcov_fp);
+	minit = 1;
+     }
      unsigned int PcD_len = (unsigned int) strlen(PcDescr); 
-     fwrite(guard, 1, 8, bcov_fp);
+     fwrite(guard, 1, 4, bcov_fp);
      fwrite(&PcD_len, 1, 4, bcov_fp);
      fwrite(PcDescr, 1, PcD_len, bcov_fp);
   }
