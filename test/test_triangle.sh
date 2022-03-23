@@ -1,4 +1,4 @@
-echo "#Test atoi with multiple inputs"
+echo "#Test triangle with multiple inputs"
 
 multiple_main="../bin/main"
 PI_dir="../test/inputs_three"
