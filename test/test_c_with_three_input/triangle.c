@@ -5,8 +5,6 @@
 int 
 main ()
 {
-	bcov_fp = fopen("./temp.bcov", "wb");
-
 	int a, b, c ;
 	int match ;
 
@@ -51,8 +49,6 @@ main ()
 	else {
 		printf("Equilateral\n") ;
 	}
-
-	fclose(bcov_fp);
 
 	return 0 ;
 }
