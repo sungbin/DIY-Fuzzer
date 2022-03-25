@@ -315,6 +315,7 @@ read_bcov (char * bcov_path) {
 			strcpy(b->des, des);
 			b->next = 0x0;
 			last_b = b;
+			printf("branch %u: %s\n", pc, b->des);
 			update_branch_set(b_set, last_b);
 		}
 		else {
@@ -337,6 +338,7 @@ read_bcov (char * bcov_path) {
 			_b->next = 0x0;
 			last_b->next = _b;
 			last_b = _b;
+			printf("branch %u: %s\n", pc, b->des);
 			update_branch_set(b_set, last_b);
 		}
 
@@ -364,7 +366,6 @@ update_branch_set (bcov_set * _set, bcov * b) {
 		__set->pc = pc;
 		__set->next = 0x0;
 		b_set = __set;
-		printf("branch %u: %s\n", pc, b->des);
 	}
 	else if (__set == 0x0) {
 		__set = _set;
