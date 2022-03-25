@@ -305,14 +305,17 @@ read_bcov (char * bcov_path) {
 		char des[1024];
 		buf_len = fread(des, 1, des_len, bcov_fp);
 		if (buf_len != des_len) break;
+		des[des_len] = 0x0;
 
-		//printf("read: %s\npc:%u, des_len:%u, des: %s\n",bcov_path, pc, des_len, des);
+//		printf("read: %s\npc:%u, des_len:%u, des: %s\n",bcov_path, pc, des_len, des);
 
 		if (b  == 0x0) {
 			b = malloc(sizeof(bcov));
 			b->pc = pc;
 			b->des_len = des_len;
-			strcpy(b->des, des);
+			strncpy(b->des, des, des_len);
+			(b->des)[des_len] = 0x0;
+			printf("copied! %s\n", b->des);
 			b->next = 0x0;
 			last_b = b;
 			update_branch_set(b_set, last_b);
@@ -333,7 +336,9 @@ read_bcov (char * bcov_path) {
 			_b = malloc(sizeof(bcov));
 			_b->pc = pc;
 			_b->des_len = des_len;
-			strcpy(b->des, des);
+			strncpy(b->des, des, des_len);
+			(b->des)[des_len] = 0x0;
+			printf("copied! %s\n", b->des);
 			_b->next = 0x0;
 			last_b->next = _b;
 			last_b = _b;
@@ -372,6 +377,7 @@ update_branch_set (bcov_set * _set, bcov * b) {
 		__set->next = malloc(sizeof(bcov_set));
 		__set->next->pc = pc;
 		__set->next->next = 0x0;
+		printf("branch %u: %s\n", pc, b->des);
 
 	}
 	else {
