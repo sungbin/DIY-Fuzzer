@@ -28,7 +28,7 @@ unsigned int total_branch;
 bcov_set * b_set = 0x0;
 
 void
-update_branch_set (bcov_set * _set, unsigned int pc);
+update_branch_set (bcov_set * _set, bcov * b);
 
 bcov*
 read_bcov (char * bcov_path);
@@ -315,17 +315,30 @@ read_bcov (char * bcov_path) {
 			strcpy(b->des, des);
 			b->next = 0x0;
 			last_b = b;
+			update_branch_set(b_set, last_b);
 		}
 		else {
-			bcov * _b = malloc(sizeof(bcov));
+			bcov * _b = b;
+			int dupl = 0;
+			while (_b != 0x0) {
+				
+				if (_b->pc == pc) {
+					dupl = 1; break;
+				}
+				
+				_b = _b->next;
+			}
+			if (dupl) break;
+
+			_b = malloc(sizeof(bcov));
 			_b->pc = pc;
 			_b->des_len = des_len;
 			strcpy(b->des, des);
 			_b->next = 0x0;
 			last_b->next = _b;
 			last_b = _b;
+			update_branch_set(b_set, last_b);
 		}
-		update_branch_set(b_set, pc);
 
 	} while(buf_len > 0);
 
@@ -333,7 +346,9 @@ read_bcov (char * bcov_path) {
 	return b;
 }
 void
-update_branch_set (bcov_set * _set, unsigned int pc) {
+update_branch_set (bcov_set * _set, bcov * b) {
+
+	unsigned int pc = b->pc;
 
 	bcov_set * __set = _set;
 	while (__set != 0x0) {
@@ -349,6 +364,7 @@ update_branch_set (bcov_set * _set, unsigned int pc) {
 		__set->pc = pc;
 		__set->next = 0x0;
 		b_set = __set;
+		printf("branch %u: %s\n", pc, b->des);
 	}
 	else if (__set == 0x0) {
 		__set = _set;
@@ -365,6 +381,7 @@ update_branch_set (bcov_set * _set, unsigned int pc) {
 }
 void
 print_branch_set (bcov_set * _set) {
+	
 	printf("Total branch Coverage of All inputs:\n");
 	unsigned int n = 0;
 	printf("{");
