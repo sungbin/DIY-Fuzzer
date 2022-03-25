@@ -51,7 +51,7 @@ get_error (enum E_Type type, int exit_code);
 void
 multiple_runner (char * target_path, char * input_dir_path, char * output_dir_path, int is_bcov) {
 
-	int is_dir = 0;
+	int is_dir = 1;
 	explore_dir_with_runner(input_dir_path, "",  &runner, target_path, output_dir_path, is_dir, is_bcov);
 	if (is_bcov) {
 		print_branch_set(b_set);
