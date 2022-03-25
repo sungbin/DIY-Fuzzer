@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "../../include/trace-pc.h"
-
 int 
 main ()
 {

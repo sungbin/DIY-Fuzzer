@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <sanitizer/coverage_interface.h>
 
-#include "../include/trace-pc.h"
-
 FILE * bcov_fp = 0x0;
 unsigned int N = 0;  // Counter for the guards.
 int minit = 0;
