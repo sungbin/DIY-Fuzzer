@@ -117,7 +117,7 @@ runner (char* target_path, char* input_path, char *output_path, int is_bcov) {
 	}
 
 	int exit_stated = WEXITSTATUS(status);
-	if ((end - start) >= 1) {
+	if ((end - start) >= 10) {
 		// Time out Kill
 		kill(pid, SIGKILL);
 		wait(&status);
